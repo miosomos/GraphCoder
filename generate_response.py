@@ -104,7 +104,7 @@ if __name__ == "__main__":
     args = parser_args()
 
     # load input
-    input_cases = load_jsonl(f"./search_res/{args.input_file_name}.search_res.jsonl")
+    input_cases = load_jsonl(f"./search_results/{args.input_file_name}.search_res.jsonl")
     print('Input loading finished')
 
     responses_save_name = f"./generation_results/{args.model}/{args.input_file_name}.{args.mode}.{args.model}.gen_res.jsonl"

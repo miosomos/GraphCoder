@@ -245,6 +245,11 @@ def python_control_flow_graph(CCG):
         if len(list(CCG.predecessors(v))) == 0:
             start_nodes.append(v)
     start_nodes.sort()
+
+    if not start_nodes:
+        # No entry points found → return empty CFG
+        return nx.MultiDiGraph(), []
+
     for i in range(0, len(start_nodes) - 1):
         v = start_nodes[i]
         u = start_nodes[i + 1]
@@ -424,7 +429,13 @@ def java_control_dependence_graph(root_node, CCG, src_lines, parent):
     elif root_node.type in ['while_statement', 'for_statement']:
         if root_node.type == 'for_statement':
             start_row = root_node.start_point[0]
-            end_row = root_node.child_by_field_name('right').end_point[0]
+            right_child = root_node.child_by_field_name('right')
+
+            if right_child is None:
+                # Can't build dependence for this node, skip
+                return
+
+            end_row = right_child.end_point[0]
         if root_node.type == 'while_statement':
             start_row = root_node.start_point[0]
             end_row = root_node.child_by_field_name('condition').end_point[0]
@@ -553,6 +564,11 @@ def java_control_flow_graph(CCG):
         if len(list(CCG.predecessors(v))) == 0:
             start_nodes.append(v)
     start_nodes.sort()
+
+    if not start_nodes:
+        # No entry points found → return empty CFG
+        return nx.MultiDiGraph(), []
+
     for i in range(0, len(start_nodes) - 1):
         v = start_nodes[i]
         u = start_nodes[i + 1]
@@ -698,9 +714,9 @@ def create_graph(code_lines, repo_name):
 
     # remove comment
     comment_prefix = ""
-    if language == "python":
+    if language.name == "python":
         comment_prefix = "#"
-    elif language == "java":
+    elif language.name == "java":
         comment_prefix = "//"
 
     comment_lines = []
@@ -720,15 +736,17 @@ def create_graph(code_lines, repo_name):
 
     all_comment = True
     for child in tree.root_node.children:
-        if child.type not in 'comment':
+        if child.type != 'comment':
             all_comment = False
+            break
+
     if all_comment:
         return None
 
     # Initialize program dependence graph
     ccg = nx.MultiDiGraph()
 
-    if language == 'python':
+    if language.name == 'python':
         # Construct control dependence edge
         for child in tree.root_node.children:
             python_control_dependence_graph(child, ccg, code_lines, None)
@@ -740,7 +758,7 @@ def create_graph(code_lines, repo_name):
         python_data_dependence_graph(cfg, ccg)
 
         ccg.add_edges_from(cfg_edge_list)
-    elif language == "java":
+    elif language.name == "java":
         # Construct control dependence edge
         for child in tree.root_node.children:
             java_control_dependence_graph(child, ccg, code_lines, None)

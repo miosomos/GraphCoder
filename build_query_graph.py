@@ -27,7 +27,7 @@ def build_query_subgraph(task_name):
             # read full query context
             case_path = os.path.join(*case['metadata']['fpath_tuple'])
             line_no = case['metadata']['line_no']
-            case_id = case['metadata']['task_id'].split('/')[0]
+            case_id = case['metadata']['fpath_tuple'][0]
             if case_id not in CONSTANTS.repos:
                 continue
             with open(os.path.join(CONSTANTS.repo_base_dir, case_path), 'r') as f:

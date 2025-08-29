@@ -2,3 +2,16 @@
 .idea/
 venv/
 .gitignore
+
+# Ignore everything under mydir/
+repositories/
+!repositories/*.zip
+
+tree-sitter-*
+
+__pycache__/
+
+graph_based_query/
+context_database/
+search_results/
+generation_results/

@@ -70,7 +70,7 @@ class GraphDatabaseBuilder:
                     start_line_row = max(0, statement_line_row-11)
                     end_line_row = min(statement_line_row+10, len(src_lines))
                     curr_dict['val'] = "".join(src_lines[start_line_row:end_line_row])
-                    curr_dict['fpath_tuple'] = file.split('/')[repo_base_dir_len:]
+                    curr_dict['fpath_tuple'] = tuple(os.path.relpath(file, self.repo_base_dir).split(os.sep))
                     max_forward_line = 0
                     if len(forward_line) != 0:
                         max_forward_line = max(forward_line)
@@ -78,8 +78,8 @@ class GraphDatabaseBuilder:
                     repo_dict.append(curr_dict.copy())
                 pbar.update(1)
 
-        save_name = os.path.join(self.graph_database_save_dir, f"{repo}.jsonl")
-        make_needed_dir(save_name)
+        save_name = os.path.join(self.graph_database_save_dir, f"{repo_name}.jsonl")
+        make_needed_dir(os.path.dirname(save_name))
         dump_jsonl(repo_dict, save_name)
         return
 
